@@ -1,2 +1,2 @@
-# PYRAMMID 
-PYRAMMID (PRedict Metagenome Medication Interaction) is a simple pipleine to predict metagenome medication Interaction.
+# PYRAMMID (PRedict Metagenome Medication Interaction)
+A simple pipleine to predict metagenome medication Interaction.
