@@ -16,5 +16,5 @@ First, building a BLAST database of the metabolic enzymes of interest that will 
 ```
 Second, running Magic-BLAST against the chosen metagenomes SRA accessions
 ```
-    magicblast -sra SRR6865476,SRR1031478,SRR5826659 -db my_reference.fa -paired -num_threads 6 -outfmt tabular -no_unaligned       -splice F > metagenome.foo
+    magicblast -sra SRR6865476,SRR1031478,SRR5826659 -db my_reference.fa -paired -num_threads 6 -outfmt tabular -no_unaligned -splice F > output.foo
 ```
