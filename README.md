@@ -12,7 +12,7 @@ To achieve this, we are using Magic-BLAST tool, which is a tool for mapping larg
 
 First, building a BLAST database of the metabolic enzymes of interest that will be used as a reference
 ```
-    makeblastdb -in my_reference.fa -out my_reference -parse_seqids -dbtype nucl
+    makeblastdb -in my_reference.fa -parse_seqids -dbtype nucl
 ```
 Second, running Magic-BLAST against the chosen metagenomes SRA accessions
 ```
