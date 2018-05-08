@@ -2,7 +2,7 @@
 
 # PYRAMMID (PRedict Metagenome Medication Interaction)
 
-A simple pipleine to predict metagenome medication Interaction.
+A simple pipeline to predict metagenome medication Interaction.
 
 
 ## Principle
