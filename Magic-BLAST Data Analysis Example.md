@@ -1,4 +1,4 @@
-These are the packages you need for the analysis
+These are the packages you need for the analysis in R
 ```
 library(plyr)
 library(rentrez)
