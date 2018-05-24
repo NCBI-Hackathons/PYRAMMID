@@ -38,7 +38,6 @@ To count how many hits per SRA
 ```
 df <- count(tab2, c('SRA','reference.acc.'))
 ```
-
 If you want to save the cleaned table
 ```
 write.csv(df,"tablegene.csv")
@@ -50,11 +49,10 @@ getSize <- function(ids) {size_mega <- c()
     run = entrez_search(db = "sra", term = term)
     exp_descrip = entrez_summary(db = "sra", id = run[[1]])
     x = exp_descrip$run
-    ## extract range defined by "total bases" and "load_done"
-    size = substr(x, start = regexpr("total_bases=", x)[[1]][1] + attr(regexpr("total_bases=", x), "match.length"),stop = regexpr(" load_done", x)[[1]][1])
-    ### some clean up
+    size = substr(x, start = regexpr("total_bases=", x)[[1]][1] + 
+    attr(regexpr("total_bases=", x), "match.length"),
+    stop = regexpr(" load_done", x)[[1]][1])
     size = gsub('\"', "", size, fixed = TRUE)
-    ## converto to numeric and Mb
     size = as.numeric(size)/1e6
     size_mega <- c(size_mega, size)}
 size_mega}
