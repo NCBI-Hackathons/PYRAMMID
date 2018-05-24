@@ -1,8 +1,8 @@
 #These are the packages you need for the analysis
-``
+```
 library(plyr)
 library(rentrez)
-``
+```
 #Read the table from magic-blast in
 tab=read.table("Magic-BLAST_output_example",header=F)
 #fixing column names
