@@ -4,6 +4,8 @@
 
 A simple pipeline to predict metagenome medication Interaction.
 
+<img src="./workflow.png">
+
 
 ## Principle
 
