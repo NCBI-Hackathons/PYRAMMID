@@ -61,6 +61,6 @@ g = ggplot(df, aes(reference.acc., trans_count))
 g + geom_boxplot() + guides(fill=FALSE) + labs(x="Female Gut Metagenome",y="log10 of Beta-Glucuronidase Hits") +
 theme_classic(base_size = 20) + geom_point()
 
-<img src="./output example.png"/>
+![](./output example.png)
 
 #Here is a very good tutorial to follow depnding on the data you have and if you have multiple groups http://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html
