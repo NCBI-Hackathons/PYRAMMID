@@ -16,11 +16,11 @@ To achieve this, we are using Magic-BLAST tool, which is a tool for mapping larg
 
 First, building a BLAST database of the metabolic enzymes of interest that will be used as a reference
 ```
-    makeblastdb -in my_reference.fa -parse_seqids -dbtype nucl
+makeblastdb -in my_reference.fa -parse_seqids -dbtype nucl
 ```
 Second, running Magic-BLAST against the chosen metagenomes SRA accessions
 ```
-    magicblast -sra SRR6865476,SRR1031478,SRR5826659 -db my_reference.fa -paired -num_threads 6 -outfmt tabular -no_unaligned -reftype transcriptome -score 50 > output.foo
+magicblast -sra SRR6865476,SRR1031478,SRR5826659 -db my_reference.fa -paired -num_threads 6 -outfmt tabular -no_unaligned -reftype transcriptome -score 50 > output.foo
 ```
 
 This is a poster showing some preliminary results from our pipeline
