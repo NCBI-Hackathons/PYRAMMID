@@ -1,4 +1,6 @@
-Supplementary Data S2. Example codes of the used softwares.
+Bioinformatics Analysis
+
+
 
 ###Unix command line
 
