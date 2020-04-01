@@ -2,7 +2,7 @@ Bioinformatics Analysis
 
 
 
-###Unix command line
+### Unix command line
 
 ##NCBI SRA Toolkit
 fastq-dump SRA --read-filter pass --skip-technical --clip --minReadLen 50 --readids --split-3 --outdir SRA
