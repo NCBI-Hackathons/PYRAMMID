@@ -11,6 +11,13 @@ A simple pipeline to predict metagenome medication Interaction.
 ### Structural similarity analysis of chemical compounds
 
 
+```
+sdfset <- read.SDFset("compounds.sdf") 
+
+tanimoto_coeff <- sapply(cid(sdfset), function(x) fmcsBatch(sdfset[x], sdfset, matching.mode="aromatic",au=1, bu=1,numParallel = 6)[,"Tanimoto_Coefficient"]) 
+
+```
+
 ### Unix command line
 
 ## NCBI SRA Toolkit
