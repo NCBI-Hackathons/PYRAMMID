@@ -6,41 +6,45 @@ A simple pipeline to predict metagenome medication Interaction.
 
 <img src="./workflow.png">
 
-## Bioinformatics Analysis
-
-### Structural similarity analysis of chemical compounds
-
-
+# Bioinformatics Analysis
+# Structural similarity analysis of chemical compounds
+## MCS analysis
 ```
-sdfset <- read.SDFset("compounds.sdf") 
-
-tanimoto_coeff <- sapply(cid(sdfset), function(x) fmcsBatch(sdfset[x], sdfset, matching.mode="aromatic",au=1, bu=1,numParallel = 6)[,"Tanimoto_Coefficient"]) 
-
+library(ChemmineR)
+library(fmcsR)
+sdfset <- read.SDFset("compounds.sdf")
+tanimoto_coeff <- sapply(cid(sdfset), function(x) fmcsBatch(sdfset[x], sdfset, matching.mode="aromatic",au=1, bu=1,numParallel = 6)[,"Tanimoto_Coefficient"])
 ```
 
-# Unix command line
+# Preparation of human gut metagenome data sets
 
 ## NCBI SRA Toolkit
+```
 fastq-dump SRA --read-filter pass --skip-technical --clip --minReadLen 50 --readids --split-3 --outdir SRA
-
-##Fastq-join
+```
+## Fastq-join
+```
 fastq-join SRA_pass_1.fastq SRA_pass_2.fastq -o SRA_%.fastq
-
-##PRINSEQ++
+```
+## PRINSEQ++
+```
 prinseq++ -fastq SRA -min_qual_mean 20 -ns_max_n 0 -derep -trim_qual_right=20 -lc_entropy -min_len 50 -threads 36 -out_format 1 -out_name SRA
-
-##MetaPhyler
+```
+## MetaPhyler
+```
 runMetaphyler.pl SRA.fasta blastn SRA 1
-
-##Magic-BLAST
+```
+## Magic-BLAST
+```
 makeblastdb -in reference.fasta -parse_seqids -dbtype nucl -out reference
 magicblast -query SRA  -db reference -outfmt tabular -no_unaligned -reftype transcriptome -num_threads 36 -score 50 >> output.table
-
-##DIAMOND
+```
+## DIAMOND
+```
 diamond makedb --in reference.fasta -d reference
 diamond blastx -d diamond_ref/reference -q SRA -o SRA_matches.m8 -p 36
-
-###R programming
+```
+### R programming
 
 ##Structural similarity analysis
 library("ChemmineR")
