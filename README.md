@@ -18,7 +18,7 @@ tanimoto_coeff <- sapply(cid(sdfset), function(x) fmcsBatch(sdfset[x], sdfset, m
 
 ```
 
-### Unix command line
+# Unix command line
 
 ## NCBI SRA Toolkit
 fastq-dump SRA --read-filter pass --skip-technical --clip --minReadLen 50 --readids --split-3 --outdir SRA
