@@ -14,10 +14,42 @@ library(ChemmineR)
 library(fmcsR)
 sdfset <- read.SDFset("compounds.sdf")
 tanimoto_coeff <- sapply(cid(sdfset), function(x) fmcsBatch(sdfset[x], sdfset, matching.mode="aromatic",au=1, bu=1,numParallel = 6)[,"Tanimoto_Coefficient"])
+write.csv(tanimoto_coeff, "fcms-Tanimoto_Coefficient.csv")
+```
+## Network analysis visualization
+```
+library(reshape)
+library(tidyverse)
+library(tidygraph)
+library(ggraph)
+library(igraph)
+df=read.csv("fcms-Tanimoto_Coefficient.csv",header=T,row.names = 1)
+df=as.matrix(df)
+n=rownames(df)
+upperTriangle=upper.tri(df, diag=F)
+cor.upperTriangle=df
+cor.upperTriangle[!upperTriangle]=NA
+cor_melted<-na.omit(melt(cor.upperTriangle))
+colnames(cor_melted)<-c("X1", "X2", "Tanimoto_Coefficient")
+cor_melted=cor_melted[cor_melted$Tanimoto_Coefficient >=.65,]
+cor.graph <- as_tbl_graph(cor_melted, directed = FALSE)
+cor.group <- data_frame(name = rownames(df))
+cor.graph <- cor.graph %>%
+   activate(nodes) %>%
+   left_join(cor.group, by = "name") %>%
+   rename(label = name)
+cor.graph %>%
+   activate(nodes) %>%
+   mutate(Clusters = as.factor(group_infomap())) %>% 
+   ggraph(layout = "graphopt") + 
+   geom_edge_arc(aes(width = Tanimoto_Coefficient), colour="lightblue") +
+   geom_node_point(aes(colour = Clusters), size = 7) +
+   geom_node_text(aes(label = label), size=5,repel = TRUE)+
+   labs(edge_width ="Tanimoto Coefficient")+
+   theme_graph()
 ```
 
 # Preparation of human gut metagenome data sets
-
 ## NCBI SRA Toolkit
 ```
 fastq-dump SRA --read-filter pass --skip-technical --clip --minReadLen 50 --readids --split-3 --outdir SRA
@@ -44,46 +76,9 @@ magicblast -query SRA  -db reference -outfmt tabular -no_unaligned -reftype tran
 diamond makedb --in reference.fasta -d reference
 diamond blastx -d diamond_ref/reference -q SRA -o SRA_matches.m8 -p 36
 ```
-### R programming
 
-##Structural similarity analysis
-library("ChemmineR")
-library(fmcsR)
-sdfset <- read.SDFset("compounds.sdf")
-sapply(cid(sdfset), function(x) fmcsBatch(sdfset[x], sdfset, au=0, bu=0,numParallel = 4)[,"Tanimoto_Coefficient"]) 
-
-#Network analysis visualization
-library(reshape)
-library(tidyverse)
-library(tidygraph)
-library(ggraph)
-library(igraph)
-df=read.csv("fcms-Tanimoto_Coefficient.csv",header=T,row.names = 1)
-df=as.matrix(df)
-n=rownames(df)
-upperTriangle=upper.tri(df, diag=F)
-cor.upperTriangle=df
-cor.upperTriangle[!upperTriangle]=NA
-cor_melted<-na.omit(melt(cor.upperTriangle))
-colnames(cor_melted)<-c("X1", "X2", "Tanimoto_Coefficient")
-cor_melted=cor_melted[cor_melted$Tanimoto_Coefficient >=.59999,]
-cor.graph <- as_tbl_graph(cor_melted, directed = FALSE)
-cor.group <- data_frame(name = rownames(df))
-cor.graph <- cor.graph %>%
-   activate(nodes) %>%
-   left_join(cor.group, by = "name") %>%
-   rename(label = name)
-cor.graph %>%
-   activate(nodes) %>%
-   mutate(Clusters = as.factor(group_infomap())) %>% 
-   ggraph(layout = "graphopt") + 
-   geom_edge_arc(aes(width = Tanimoto_Coefficient), colour="lightblue") +
-   geom_node_point(aes(colour = Clusters), size = 7) +
-   geom_node_text(aes(label = label), size=5,repel = TRUE)+
-   labs(edge_width ="Tanimoto Coefficient")+
-   theme_graph()
-
-##Magic-BLAST downstream analysis
+## Magic-BLAST downstream analysis
+```
 #Reading the magic-blast output table
 library(plyr)
 magic_tab=read.table("output.table",header=F)
@@ -115,8 +110,9 @@ final$norm_count=((final$freq*mean(final$phyla)*10)/final$phyla)
 final$trans_norm_count=log2(final$norm_count)
 #Writing everything to a table
 write.csv(final,"results_clean.csv")
-
-##DIAMOND downstream analysis
+```
+## DIAMOND downstream analysis
+```
 #Reading the DIAMOND output table
 library(plyr)
 tab=read.table("diamond_results",header=F)
@@ -145,9 +141,7 @@ final$norm_count=((final$freq*mean(final$phyla)*10)/final$phyla)
 final$trans_norm_count=log2(final2$norm_count)
 #Writing everything to a table
 write.csv(final2,"results_clean_diamond90_50.csv")
-
-
-
+```
 
 ## Principle
 
