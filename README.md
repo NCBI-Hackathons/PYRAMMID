@@ -4,8 +4,6 @@
 
 A simple pipeline to predict metagenome medication Interaction.
 
-<img src="./workflow.png">
-
 # Bioinformatics Analysis
 # Structural similarity analysis of chemical compounds
 ## MCS analysis
@@ -66,51 +64,12 @@ prinseq++ -fastq SRA -min_qual_mean 20 -ns_max_n 0 -derep -trim_qual_right=20 -l
 ```
 runMetaphyler.pl SRA.fasta blastn SRA 1
 ```
-## Magic-BLAST
-```
-makeblastdb -in reference.fasta -parse_seqids -dbtype nucl -out reference
-magicblast -query SRA  -db reference -outfmt tabular -no_unaligned -reftype transcriptome -num_threads 36 -score 50 >> output.table
-```
 ## DIAMOND
 ```
 diamond makedb --in reference.fasta -d reference
 diamond blastx -d diamond_ref/reference -q SRA -o SRA_matches.m8 -p 36
 ```
 
-## Magic-BLAST downstream analysis
-```
-#Reading the magic-blast output table
-library(plyr)
-magic_tab=read.table("output.table",header=F)
-#Adding column names
-col_names=c("query.acc.","reference.acc.","% identity","not used","not.used",
-        "not.used","query.start","query.end","reference.start","reference.end","not.used",
-            "not.used","score","query.strand","reference.strand","query.length","BTOP",
-            "num.placements","not.used","compartment","left.overhang","right.overhang",
-            "mate.reference","mate.ref..start","composite.score")
-colnames(tab)=col_names
-#Remove duplicate hits for each sequence
-magic_tab$reference.acc.=sub("[0-9]","",magic_tab$reference.acc.)
-magic_tab$reference.acc.=sub("[0-9]","",magic_tab$reference.acc.)
-magic_tab$seq=sub("..$","",magic_tab$query.acc.)
-mod_table=magic_tab[!duplicated(magic_tab[,"seq"]),]
-#Clean SRA names to aggregate them
-mod_table$SRA=sub("\\..*","",mod_table$seq)
-mod_table=mod_table[mod_table$`% identity`>=90,]
-count_table<- count(mod_table, c('SRA','reference.acc.'))
-#Reading in the MetaPhyler results
-taxa=read.table("result_taxa.txt",header=F)
-colnames(taxa)=c("SRA","phyla")
-almost_final=merge(count_table, taxa, all.x = TRUE)
-#Reading in the metadata for the SRA
-metadata=read.csv("metadata.csv",header=T)
-final=merge(almost_final, metadata, all.x = TRUE)
-#Normalizing the data to the metagenome size and transforming (log2)
-final$norm_count=((final$freq*mean(final$phyla)*10)/final$phyla)
-final$trans_norm_count=log2(final$norm_count)
-#Writing everything to a table
-write.csv(final,"results_clean.csv")
-```
 ## DIAMOND downstream analysis
 ```
 #Reading the DIAMOND output table
@@ -126,8 +85,6 @@ tab$seq=sub("..$","",tab$query.acc.)
 tab2=tab[!duplicated(tab[,"seq"]),]
 #Clean SRA names to aggregate them
 tab2$SRA=sub("\\..*","",tab2$seq)
-tab3=tab2[tab2$V3>=90,]
-tab3=tab3[tab3$V4>=50,]
 df <- count(tab3, c('SRA','reference.acc.'))
 #Reading in the MetaPhyler results
 taxa=read.table("result_taxa.txt",header=F)
@@ -137,27 +94,7 @@ almost_final=merge(df, taxa, all.x = TRUE)
 metadata=read.csv("metadata.csv",header=T)
 final=merge(almost_final, metadata, all.x = TRUE)
 #Normalizing the data to the metagenome size and transforming (log2)
-final$norm_count=((final$freq*mean(final$phyla)*10)/final$phyla)
-final$trans_norm_count=log2(final2$norm_count)
+final$norm_count=(final$freq*1000)/final$phyla
 #Writing everything to a table
-write.csv(final2,"results_clean_diamond90_50.csv")
+write.csv(final2,"results_clean_diamond.csv")
 ```
-
-## Principle
-
-To achieve this, we are using Magic-BLAST tool, which is a tool for mapping large next-generation RNA or DNA sequencing runs against a whole genome or transcriptome. Using publicly available Sequence Read Archive (SRA) of human metagnome as a query and in-house enzymes database that is based on the human enzymes invoved in drug metabolism, we may predict the metabolic enzymatic capacity of human metagenomes. This will achieve our goal, to predict potential metagenome medication interactions.
-
-
-## How it works
-
-First, building a BLAST database of the metabolic enzymes of interest that will be used as a reference
-```
-makeblastdb -in my_reference.fa -parse_seqids -dbtype nucl
-```
-Second, running Magic-BLAST against the chosen metagenomes SRA accessions
-```
-magicblast -sra SRR6865476,SRR1031478,SRR5826659 -db my_reference.fa -paired -num_threads 6 -outfmt tabular -no_unaligned -reftype transcriptome -score 50 > output.foo
-```
-
-This is a poster showing some preliminary results from our pipeline
-<img src="./pyrammid_final.png">
